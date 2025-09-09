@@ -1,0 +1,95 @@
+/* ========================
+   Dashboard Integrado
+   ======================== */
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background-color: #f5f6fa;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Cabeçalho */
+header {
+  background-color: #004080;
+  color: #fff;
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 4px solid #002b5c;
+}
+
+header h1 {
+  font-size: 1.8rem;
+}
+
+/* Container principal */
+.container {
+  flex: 1;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+/* Cards */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #004080;
+}
+
+.card p {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Área dos gráficos */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+}
+
+/* Rodapé */
+footer {
+  background-color: #004080;
+  color: #fff;
+  text-align: center;
+  padding: 0.8rem;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 0.8rem;
+  }
+
+  .chart-container {
+    height: 250px;
+  }
+}
