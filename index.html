@@ -16,7 +16,7 @@
     <section class="menu-section">
       <h2>Andaime</h2>
       <div class="buttons">
-        <a href="std.html" class="btn">Dashboard STD</a>
+        <button class="btn" data-link="Andaime/std.html">Dashboard STD</button>
       </div>
     </section>
 
@@ -24,7 +24,15 @@
     <section class="menu-section">
       <h2>Pintura</h2>
       <div class="buttons">
-        <a href="pintura.html" class="btn">Dashboard Pintura</a>
+        <button class="btn" data-link="Pintura/pintura.html">Dashboard Pintura</button>
+      </div>
+    </section>
+
+    <!-- Seção Integrado -->
+    <section class="menu-section">
+      <h2>Integrado</h2>
+      <div class="buttons">
+        <button class="btn" data-link="Integrado/dashboard_integrado.html">Dashboard Integrado</button>
       </div>
     </section>
   </main>
@@ -32,5 +40,14 @@
   <footer>
     <p>© 2025 - Sistema de Dashboards - José Victor Silva de Jesus</p>
   </footer>
+
+  <script>
+    // Redirecionamento de botões
+    document.querySelectorAll('button[data-link]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        window.location.href = btn.getAttribute('data-link');
+      });
+    });
+  </script>
 </body>
 </html>
