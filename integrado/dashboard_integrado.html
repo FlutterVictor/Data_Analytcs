@@ -1,78 +1,79 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Integrado</title>
-
-  <!-- CSS local (se estiver na mesma pasta) -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Integrado — Andaime & Pintura</title>
   <link rel="stylesheet" href="dashboard_integrado.css">
-
-  <!-- OU CSS direto do GitHub RAW -->
-  <!-- <link rel="stylesheet" href="https://raw.githubusercontent.com/FlutterVictor/Data_Analytcs/main/integrado/dashboard_integrado.css"> -->
-
-  <!-- Bibliotecas -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <div class="wrap">
-    <!-- Header -->
-    <header class="dashboard-header">
-      <h1>Dashboard Integrado</h1>
-      <div class="dashboard-buttons">
-        <a href="../index.html" class="btn-voltar">Voltar</a>
-        <input type="date" id="dataInicio">
-        <input type="date" id="dataFim">
-        <button id="filtrar">Filtrar</button>
-      </div>
+  <div class="wrap integrado-wrap" id="integradoWrap">
+    <header>
+      <h1>Dashboard Integrado — Andaime & Pintura</h1>
+      <div class="subtitle">Integração: Consumo Pintura • STD Andaime • SGE Horas — indicadores baseados em STD</div>
     </header>
 
-    <!-- Container -->
-    <main class="dashboard-container">
-      <!-- STD Andaime -->
-      <div class="card">
-        <h3>Produtividade Andaime (STD)</h3>
-        <canvas id="andaimeSTDChart"></canvas>
+    <div class="controls">
+      <button id="btnLoadExample">Carregar Mockup</button>
+      <button id="btnExportPDF">Exportar PDF</button>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="label">STD Pintura (médio)</div>
+        <div class="value" id="kpiStdPintura">-</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">STD Andaime (médio)</div>
+        <div class="value" id="kpiStdAndaime">-</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">HH Previstas vs Reais</div>
+        <div class="value" id="kpiHHPrevReal">-</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Eficiência Global (STD agregado)</div>
+        <div class="value" id="kpiStdGlobal">-</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="col-left">
+        <div class="card">
+          <div class="card-title">Tendência STD — Pintura (HH / m²) & Andaime (HH / m.l.)</div>
+          <canvas id="trendChart"></canvas>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <div class="card-title">Comparativo Previsto x Real (HH)</div>
+          <canvas id="hhCompareChart"></canvas>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>STD Previsto x Real - Andaime</h3>
-        <canvas id="andaimePrevistoRealChart"></canvas>
+      <div class="col-right">
+        <div class="card">
+          <div class="card-title">Produtividade por Encarregado — Pintura (Top 8)</div>
+          <ul id="listStdPintura" class="list-card"></ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Produtividade por Encarregado — Andaime (Top 8)</div>
+          <ul id="listStdAndaime" class="list-card"></ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Amostra Pintura</div>
+          <ul id="samplePintura" class="list-card"></ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Amostra Andaime</div>
+          <ul id="sampleAndaime" class="list-card"></ul>
+        </div>
       </div>
-
-      <!-- Consumo Pintura -->
-      <div class="card">
-        <h3>Consumo de Tintas</h3>
-        <canvas id="tintasChart"></canvas>
-      </div>
-
-      <div class="card">
-        <h3>Litros Consumidos por OS</h3>
-        <canvas id="litrosPorOSChart"></canvas>
-      </div>
-
-      <div class="card">
-        <h3>M² Pintados por Mês</h3>
-        <canvas id="m2MesChart"></canvas>
-      </div>
-
-      <!-- SGE Horas -->
-      <div class="card">
-        <h3>Horas Previstas x Reais (SGE)</h3>
-        <canvas id="horasPrevistoRealChart"></canvas>
-      </div>
-    </main>
-
-    <footer>
-      <p>© 2025 - Sistema de Dashboards Integrados</p>
-    </footer>
+    </div>
   </div>
 
-  <!-- JS local -->
   <script src="dashboard_integrado.js"></script>
-
-  <!-- OU JS direto do GitHub RAW -->
-  <!-- <script src="https://raw.githubusercontent.com/FlutterVictor/Data_Analytcs/main/integrado/dashboard_integrado.js"></script> -->
 </body>
 </html>
