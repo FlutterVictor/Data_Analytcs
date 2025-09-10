@@ -1,418 +1,78 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard Integrado — Andaime & Pintura</title>
-  <!-- Reusa style.css do seu projeto; mantenho um CSS complementar para layout responsivo específico deste painel -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Integrado</title>
+
+  <!-- CSS local (se estiver na mesma pasta) -->
   <link rel="stylesheet" href="dashboard_integrado.css">
-  <style>
-    /* Complemento visual para o painel integrado - segue mesma estética */
-    .integrado-wrap{max-width:1400px;margin:28px auto;padding:18px}
-    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
-    .controls input[type=file]{padding:8px}
-    .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:12px}
-    .kpi-card{background:var(--card);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(7,22,48,0.06);text-align:center}
-    .kpi-card .label{font-size:13px;color:var(--gray)}
-    .kpi-card .value{font-size:20px;font-weight:700;margin-top:6px}
 
-    .charts-grid{display:grid;gap:16px;margin-top:16px;grid-template-columns:2fr 1fr}
-    .charts-grid .col-right{display:grid;gap:16px}
+  <!-- OU CSS direto do GitHub RAW -->
+  <!-- <link rel="stylesheet" href="https://raw.githubusercontent.com/FlutterVictor/Data_Analytcs/main/integrado/dashboard_integrado.css"> -->
 
-    /* para mobile */
-    @media(max-width:900px){
-      .charts-grid{grid-template-columns:1fr}
-    }
-
-    /* pequenos ajustes para canvas */
-    .card canvas{width:100% !important;max-height:260px}
-  </style>
   <!-- Bibliotecas -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 </head>
 <body>
-  <div class="wrap integrado-wrap" id="integradoWrap">
-    <header>
-      <h1>Dashboard Integrado — Andaime & Pintura</h1>
-      <div class="subtitle">Integração: Consumo Pintura • STD Andaime • SGE Horas — indicadores baseados em STD</div>
+  <div class="wrap">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <h1>Dashboard Integrado</h1>
+      <div class="dashboard-buttons">
+        <a href="../index.html" class="btn-voltar">Voltar</a>
+        <input type="date" id="dataInicio">
+        <input type="date" id="dataFim">
+        <button id="filtrar">Filtrar</button>
+      </div>
     </header>
 
-    <div class="controls">
-      <label>Consumo Pintura (CSV/XLSX): <input type="file" id="filePintura" accept=".csv,.xls,.xlsx"></label>
-      <label>STD Andaime (CSV/XLSX): <input type="file" id="fileSTD" accept=".csv,.xls,.xlsx"></label>
-      <label>SGE Horas (CSV/XLSX): <input type="file" id="fileSGE" accept=".csv,.xls,.xlsx"></label>
-      <button id="btnLoadExample">Carregar exemplos (mockup)</button>
-      <button id="btnExportPDF">Exportar PDF</button>
-    </div>
-
-    <!-- KPIs -->
-    <div class="kpi-row">
-      <div class="kpi-card">
-        <div class="label">STD Pintura (médio)</div>
-        <div class="value" id="kpiStdPintura">-</div>
-      </div>
-      <div class="kpi-card">
-        <div class="label">STD Andaime (médio)</div>
-        <div class="value" id="kpiStdAndaime">-</div>
-      </div>
-      <div class="kpi-card">
-        <div class="label">HH Previstas vs Reais</div>
-        <div class="value" id="kpiHHPrevReal">-</div>
-      </div>
-      <div class="kpi-card">
-        <div class="label">Eficiência Global (STD agregado)</div>
-        <div class="value" id="kpiStdGlobal">-</div>
-      </div>
-    </div>
-
-    <div class="charts-grid">
-      <div class="col-left">
-        <div class="card">
-          <div class="card-title">Tendência STD — Pintura (HH / m²) & Andaime (HH / m.l.)</div>
-          <canvas id="trendChart"></canvas>
-        </div>
-        <div class="card" style="margin-top:12px">
-          <div class="card-title">Comparativo Previsto x Real (HH)</div>
-          <canvas id="hhCompareChart"></canvas>
-        </div>
+    <!-- Container -->
+    <main class="dashboard-container">
+      <!-- STD Andaime -->
+      <div class="card">
+        <h3>Produtividade Andaime (STD)</h3>
+        <canvas id="andaimeSTDChart"></canvas>
       </div>
 
-      <div class="col-right">
-        <div class="card">
-          <div class="card-title">STD por Encarregado — Pintura (top 8)</div>
-          <canvas id="stdPinturaChart"></canvas>
-        </div>
-        <div class="card">
-          <div class="card-title">STD por Encarregado — Andaime (top 8)</div>
-          <canvas id="stdAndaimeChart"></canvas>
-        </div>
+      <div class="card">
+        <h3>STD Previsto x Real - Andaime</h3>
+        <canvas id="andaimePrevistoRealChart"></canvas>
       </div>
-    </div>
 
+      <!-- Consumo Pintura -->
+      <div class="card">
+        <h3>Consumo de Tintas</h3>
+        <canvas id="tintasChart"></canvas>
+      </div>
+
+      <div class="card">
+        <h3>Litros Consumidos por OS</h3>
+        <canvas id="litrosPorOSChart"></canvas>
+      </div>
+
+      <div class="card">
+        <h3>M² Pintados por Mês</h3>
+        <canvas id="m2MesChart"></canvas>
+      </div>
+
+      <!-- SGE Horas -->
+      <div class="card">
+        <h3>Horas Previstas x Reais (SGE)</h3>
+        <canvas id="horasPrevistoRealChart"></canvas>
+      </div>
+    </main>
+
+    <footer>
+      <p>© 2025 - Sistema de Dashboards Integrados</p>
+    </footer>
   </div>
 
-  <script>
-    /*****************************************
-     * Parsers e normalizadores
-     *****************************************/
-    function readFileAsText(file){
-      return new Promise((res, rej)=>{
-        const reader = new FileReader();
-        reader.onload = e=>res(e.target.result);
-        reader.onerror = e=>rej(e);
-        reader.readAsText(file);
-      });
-    }
+  <!-- JS local -->
+  <script src="dashboard_integrado.js"></script>
 
-    function readWorkbook(file){
-      return new Promise((res,rej)=>{
-        const reader = new FileReader();
-        reader.onload = e=>{
-          try{
-            const data = new Uint8Array(e.target.result);
-            const wb = XLSX.read(data,{type:'array'});
-            const first = wb.SheetNames[0];
-            const ws = wb.Sheets[first];
-            const json = XLSX.utils.sheet_to_json(ws,{defval:''});
-            res(json);
-          }catch(err){rej(err)}
-        };
-        reader.onerror = e=>rej(e);
-        reader.readAsArrayBuffer(file);
-      });
-    }
-
-    async function parseAny(file){
-      const name = file.name.toLowerCase();
-      if(name.endsWith('.csv')){
-        const text = await readFileAsText(file);
-        return Papa.parse(text,{header:true,skipEmptyLines:true}).data;
-      }
-      // xls / xlsx
-      return readWorkbook(file);
-    }
-
-    function normalizeKey(k){
-      if(!k) return '';
-      return String(k).trim();
-    }
-
-    /*****************************************
-     * Mapeamentos esperados (colunas)
-     *****************************************/
-    // Funções auxiliares para extrair campos com flexibilidade de nomes
-    function getField(row, variants){
-      for(const v of variants){
-        if(row.hasOwnProperty(v)) return row[v];
-      }
-      // try case-insensitive
-      const keys = Object.keys(row);
-      for(const k of keys){
-        if(k && variants.some(v=>k.toLowerCase().includes(v.toLowerCase()))) return row[k];
-      }
-      return '';
-    }
-
-    /*****************************************
-     * Normalizadores específicos de cada fonte
-     *****************************************/
-    function normalizePintura(rows){
-      return rows.map(r=>{
-        return {
-          ref: getField(r,['Ref','REF']) || '',
-          descricao: getField(r,['Descrição do produto','Descricao do produto','Descrição','Descricao','Descrição do Produto','Descrição do produto'])||'',
-          data: getField(r,['Data Saída','Data','Data Saida','Data Saída'])||'',
-          diaSemana: getField(r,['Dia da semana','Dia','Dia da Semana'])||'',
-          os: getField(r,['OS','Os','os'])||'',
-          area: getField(r,['Área de aplicação','Area de aplicação','Área','Area'])||'',
-          quantidade: parseFloat((getField(r,['Quantidade','Qtd','QTD'])||0)||0) || 0,
-          m2: parseFloat((getField(r,['M²','M2','M²','M² ' ,'M²'])||0)||0) || 0,
-          ubm: getField(r,['UBM','U.B.M','Unidade'])||'',
-          tipo: getField(r,['Tipo de aplicação','Tipo'])||'',
-          encarregado: getField(r,['Encarregado','Encarregado.','Encarregado '])||''
-        }
-      });
-    }
-
-    function normalizeSTD(rows){
-      return rows.map(r=>{
-        return {
-          semana: getField(r,['Semanas','Semana','Semana '])||'',
-          os: getField(r,['OS','Os','os'])||'',
-          matricula: getField(r,['Matricula','Matrícula'])||'',
-          encarregado: getField(r,['Encarregado','Encarregado Responsavel','Encarregado.'])||'',
-          area: getField(r,['Área','Area'])||'',
-          montPresente: parseFloat(getField(r,['Mont.Presente','Mont.Presente ','Montadores','Mont.Presente'])||0)||0,
-          hhTotal: parseFloat(getField(r,['HH Total','HH','HH_Total'])||0)||0,
-          mlMontados: parseFloat(getField(r,['ML Montados','ML','ML_Montados','ML Montados'])||0)||0,
-          mlPrevisto: parseFloat(getField(r,['ML PREVISTO','ML Previsto','ML_PREVISTO'])||0)||0,
-          stdPrevisto: parseFloat(getField(r,['STD PREVISTO','STD Previsto','STD_PREVISTO'])||0)||0,
-          stdMontado: parseFloat(getField(r,['STD Montado','STD Montado '])||0)||0,
-          data: getField(r,['Data','Data Saída','Data Saida'])||''
-        }
-      });
-    }
-
-    function normalizeSGE(rows){
-      return rows.map(r=>{
-        return {
-          dataRef: getField(r,['Data Ref.','Data','Data Ref'])||'',
-          matricula: getField(r,['Matricula','Matrícula'])||'',
-          recurso: getField(r,['Recurso'])||'',
-          cargo: getField(r,['Cargo'])||'',
-          entrada: getField(r,['Entrada Catraca','Entrada'])||'',
-          inicio: getField(r,['Início','Inicio'])||'',
-          fim: getField(r,['Fim'])||'',
-          saida: getField(r,['Saida Catraca','Saida','Saída'])||'',
-          totalHoras: parseFloat(getField(r,['Total Horas','TotalHoras','Total_Horas'])||0)||0,
-          tempoPermanencia: getField(r,['Tempo Permanência','Tempo Permanencia'])||0,
-          rdc: getField(r,['RDC'])||'',
-          os: getField(r,['OS / Entregável','OS','Entregável','OS/Entregavel'])||'',
-          contrato: getField(r,['Contrato'])||'',
-          empresa: getField(r,['Empresa'])||'',
-          situacao: getField(r,['Situação','Situacao'])||''
-        }
-      });
-    }
-
-    /*****************************************
-     * Cálculos de STD e agregações
-     *****************************************/
-    function calcStdPintura(pinturaRows, sgeRows){
-      // Agrupa M2 por OS e soma HH do SGE por OS
-      const m2ByOS = {};
-      pinturaRows.forEach(r=>{ const os=r.os||'__SEM_OS__'; m2ByOS[os]=(m2ByOS[os]||0)+ (Number(r.m2)||0);});
-      const hhByOS = {};
-      sgeRows.forEach(r=>{ const os=r.os||'__SEM_OS__'; hhByOS[os]=(hhByOS[os]||0)+ (Number(r.totalHoras)||0);});
-
-      const osList = Array.from(new Set([...Object.keys(m2ByOS), ...Object.keys(hhByOS)])).filter(o=>o!=='');
-      const result = osList.map(os=>{
-        const m2 = m2ByOS[os]||0;
-        const hh = hhByOS[os]||0;
-        const std = m2>0 ? (hh / m2) : null; // HH / M2
-        return { os, m2, hh, std };
-      });
-      return result;
-    }
-
-    function calcStdAndaime(stdRows, sgeRows){
-      // Agrupa ML por OS e HH por OS
-      const mlByOS = {};
-      stdRows.forEach(r=>{ const os=r.os||'__SEM_OS__'; mlByOS[os]=(mlByOS[os]||0)+ (Number(r.mlMontados)||0);});
-      const hhByOS = {};
-      sgeRows.forEach(r=>{ const os=r.os||'__SEM_OS__'; hhByOS[os]=(hhByOS[os]||0)+ (Number(r.totalHoras)||0);});
-
-      const osList = Array.from(new Set([...Object.keys(mlByOS), ...Object.keys(hhByOS)])).filter(o=>o!=='');
-      const result = osList.map(os=>{
-        const ml = mlByOS[os]||0;
-        const hh = hhByOS[os]||0;
-        const std = ml>0 ? (hh / ml) : null; // HH / ML
-        return { os, ml, hh, std };
-      });
-      return result;
-    }
-
-    function aggregateGlobal(stdPintArr, stdAndaArr){
-      // Calcula STD global ponderado por "quantidade" (m2 + ml)
-      let hhTotal=0, denom=0;
-      stdPintArr.forEach(r=>{ hhTotal += r.hh; denom += r.m2; });
-      stdAndaArr.forEach(r=>{ hhTotal += r.hh; denom += r.ml; });
-      const stdGlobal = denom>0 ? (hhTotal / denom) : null;
-      return { hhTotal, denom, stdGlobal };
-    }
-
-    /*****************************************
-     * Gráficos (Chart.js)
-     *****************************************/
-    let charts = {};
-    function destroyChart(id){ if(charts[id]){ charts[id].destroy(); charts[id]=null; } }
-
-    function chartStdPerEncarregado(id, dataArr, labelKey, stdKey, title){
-      destroyChart(id);
-      const labels = dataArr.map(d=>d[labelKey]);
-      const data = dataArr.map(d=>d[stdKey]===null?0:d[stdKey]);
-      const ctx = document.getElementById(id).getContext('2d');
-      charts[id] = new Chart(ctx,{
-        type:'bar',
-        data:{labels, datasets:[{label:'STD', data, backgroundColor:'#0b63d6'}]},
-        options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}
-      });
-    }
-
-    function chartTrend(trendData){
-      destroyChart('trendChart');
-      const ctx = document.getElementById('trendChart').getContext('2d');
-      const labels = trendData.map(d=>d.label);
-      const pintura = trendData.map(d=>d.stdPintura===null?null:Number(d.stdPintura));
-      const andaime = trendData.map(d=>d.stdAndaime===null?null:Number(d.stdAndaime));
-      charts['trendChart'] = new Chart(ctx,{type:'line',data:{labels, datasets:[{label:'STD Pintura (HH/m²)',data:pintura,borderColor:'#0b63d6',tension:0.2,spanGaps:true},{label:'STD Andaime (HH/m.l.)',data:andaime,borderColor:'#f59e0b',tension:0.2,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:false}}}});
-    }
-
-    function chartHHCompare(data){
-      destroyChart('hhCompareChart');
-      const ctx = document.getElementById('hhCompareChart').getContext('2d');
-      const labels = data.map(d=>d.label);
-      const prev = data.map(d=>d.prev||0);
-      const real = data.map(d=>d.real||0);
-      charts['hhCompareChart'] = new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Previsto',data:prev,backgroundColor:'#0b63d6'},{label:'Real',data:real,backgroundColor:'#10b981'}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}});
-    }
-
-    /*****************************************
-     * Render e atualização de KPIs + lógica
-     *****************************************/
-    function updateKPIs(stdPintArr, stdAndaArr, sgeRows){
-      // KPIs pint
-      const pintValid = stdPintArr.filter(r=>r.std!==null);
-      const andaValid = stdAndaArr.filter(r=>r.std!==null);
-      const avgPint = pintValid.length? (pintValid.reduce((a,b)=>a+b.std,0)/pintValid.length):null;
-      const avgAnda = andaValid.length? (andaValid.reduce((a,b)=>a+b.std,0)/andaValid.length):null;
-      document.getElementById('kpiStdPintura').textContent = avgPint!==null?avgPint.toFixed(3):'-';
-      document.getElementById('kpiStdAndaime').textContent = avgAnda!==null?avgAnda.toFixed(3):'-';
-
-      // HH prev vs real -> assumimos que STD rows possuem mlPrevisto/hhPrevisto se houver
-      const hhPrevisto = (stdAndaArr.reduce((s,r)=>s+ (r.hhPrev||0),0) + stdPintArr.reduce((s,r)=>s+(r.hhPrev||0),0));
-      const hhReal = sgeRows.reduce((s,r)=>s + (Number(r.totalHoras)||0),0);
-      document.getElementById('kpiHHPrevReal').textContent = hhPrevisto>0? hhReal.toFixed(1) + ' / ' + hhPrevisto.toFixed(1) : hhReal.toFixed(1) + ' / -';
-
-      const global = aggregateGlobal(stdPintArr, stdAndaArr);
-      document.getElementById('kpiStdGlobal').textContent = global.stdGlobal!==null?global.stdGlobal.toFixed(3):'-';
-
-      // Charts auxiliares: STD por encarregado (top)
-      const byEncPint = {};
-      stdPintArr.forEach(r=>{ const enc = r.en || 'Sem'; byEncPint[enc] = byEncPint[enc] || {m2:0,hh:0}; byEncPint[enc].m2+=r.m2; byEncPint[enc].hh+=r.hh; });
-      const arrP = Object.entries(byEncPint).map(([k,v])=>({enc:k,std:v.m2>0? v.hh/v.m2 : null})).sort((a,b)=>(b.std||0)-(a.std||0)).slice(0,8);
-      chartStdPerEncarregado('stdPinturaChart', arrP, 'enc', 'std');
-
-      const byEncAnda = {};
-      stdAndaArr.forEach(r=>{ const enc = r.en || 'Sem'; byEncAnda[enc] = byEncAnda[enc] || {ml:0,hh:0}; byEncAnda[enc].ml+=r.ml; byEncAnda[enc].hh+=r.hh; });
-      const arrA = Object.entries(byEncAnda).map(([k,v])=>({enc:k,std:v.ml>0? v.hh/v.ml : null})).sort((a,b)=>(b.std||0)-(a.std||0)).slice(0,8);
-      chartStdPerEncarregado('stdAndaimeChart', arrA, 'enc', 'std');
-
-      // Trend (agregação por semana - simplificada por dataRef ou semana)
-      const dates = Array.from(new Set([...(stdPintArr.map(r=>r.period)), ...(stdAndaArr.map(r=>r.period))])).sort();
-      const trend = dates.map(d=>{
-        const sp = stdPintArr.filter(r=>r.period===d);
-        const sa = stdAndaArr.filter(r=>r.period===d);
-        const stdP = sp.length? (sp.reduce((s,x)=>s+(x.std||0),0)/sp.length):null;
-        const stdA = sa.length? (sa.reduce((s,x)=>s+(x.std||0),0)/sa.length):null;
-        return { label:d, stdPintura:stdP, stdAndaime:stdA };
-      });
-      chartTrend(trend);
-
-      // HH compare: por período (mes ou semana)
-      const hhCompare = dates.map(d=>{
-        const prev = 0; // placeholder - se tiver previstos preencher
-        const real = sgeRows.filter(r=> (r.dataRef||'').includes(d)).reduce((s,x)=>s+Number(x.totalHoras||0),0);
-        return { label:d, prev, real };
-      });
-      chartHHCompare(hhCompare);
-    }
-
-    /*****************************************
-     * Pipeline: recebe 3 arrays e atualiza tudo
-     *****************************************/
-    function processAll(pinturaRaw, stdRaw, sgeRaw){
-      const pintura = normalizePintura(pinturaRaw);
-      const std = normalizeSTD(stdRaw);
-      const sge = normalizeSGE(sgeRaw);
-
-      // Prepara arrays por OS com period (mês-ano) para tendência
-      const toPeriod = d=>{ if(!d) return ''; const dt = new Date(d); if(isNaN(dt)) return d; return (dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0')); };
-      const stdPintArr = calcStdPintura(pintura, sge).map(r=>({ ...r, period: '' }));
-      const stdAndaArr = calcStdAndaime(std, sge).map(r=>({ ...r, period: '' }));
-
-      // Tenta preencher periodos por data nos registros originais (simples heuristica)
-      pintura.forEach(p=>{ if(p.os){ const per = toPeriod(p.data); stdPintArr.find(x=>x.os===p.os && (x.period==='')).period = per || ''; } });
-      std.forEach(s=>{ if(s.os){ const per = toPeriod(s.data); stdAndaArr.find(x=>x.os===s.os && (x.period==='')).period = per || ''; } });
-
-      // atribui encarregado por OS (heurística: pega primeiro encarregado encontrado nas fontes)
-      stdPintArr.forEach(x=>{ const found = pintura.find(p=>p.os===x.os); x.en = found? found.encarregado : ''; });
-      stdAndaArr.forEach(x=>{ const found = std.find(s=>s.os===x.os); x.en = found? found.encarregado : ''; });
-
-      updateKPIs(stdPintArr, stdAndaArr, sge);
-    }
-
-    /*****************************************
-     * Handlers de input
-     *****************************************/
-    let upload = { pintura:[], std:[], sge:[] };
-
-    document.getElementById('filePintura').addEventListener('change',async e=>{
-      const f = e.target.files[0]; if(!f) return; upload.pintura = await parseAny(f); try{ processAll(upload.pintura, upload.std, upload.sge); }catch(err){console.error(err)}
-    });
-    document.getElementById('fileSTD').addEventListener('change',async e=>{
-      const f = e.target.files[0]; if(!f) return; upload.std = await parseAny(f); try{ processAll(upload.pintura, upload.std, upload.sge); }catch(err){console.error(err)}
-    });
-    document.getElementById('fileSGE').addEventListener('change',async e=>{
-      const f = e.target.files[0]; if(!f) return; upload.sge = await parseAny(f); try{ processAll(upload.pintura, upload.std, upload.sge); }catch(err){console.error(err)}
-    });
-
-    // Botão mockup para testar sem arquivos
-    document.getElementById('btnLoadExample').addEventListener('click', ()=>{
-      // Exemplo mínimo para testar fluxo
-      const pinturaEx = [{"Ref":"TINTA","Descrição do produto":"Tinta X","Data Saída":"2025-08-01","OS":"OS001","M²":120,"Quantidade":50,"Encarregado":"João"}];
-      const stdEx = [{"OS":"OS001","ML Montados":30,"HH Total":40,"Data":"2025-08-01","Encarregado":"Carlos"}];
-      const sgeEx = [{"OS / Entregável":"OS001","Total Horas":40,"Data Ref.":"2025-08-01"}];
-      upload.pintura = pinturaEx; upload.std = stdEx; upload.sge = sgeEx; processAll(upload.pintura, upload.std, upload.sge);
-    });
-
-    // Exportar PDF (simples - similar ao seu script anterior)
-    document.getElementById('btnExportPDF').addEventListener('click', ()=>{
-      import('https://html2canvas.hertzen.com/dist/html2canvas.min.js').then(()=>{
-        html2canvas(document.getElementById('integradoWrap'),{scale:2}).then(canvas=>{
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new window.jspdf.jsPDF({orientation:'landscape',unit:'pt',format:'a4'});
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const imgProps = pdf.getImageProperties(imgData);
-          const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-          pdf.addImage(imgData,'PNG',0,0,pdfWidth,imgHeight);
-          pdf.save('dashboard_integrado.pdf');
-        });
-      });
-    });
-
-  </script>
+  <!-- OU JS direto do GitHub RAW -->
+  <!-- <script src="https://raw.githubusercontent.com/FlutterVictor/Data_Analytcs/main/integrado/dashboard_integrado.js"></script> -->
 </body>
 </html>
