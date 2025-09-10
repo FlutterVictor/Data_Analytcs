@@ -1,8 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Integrado — Andaime & Pintura</title>
   <link rel="stylesheet" href="dashboard_integrado.css">
   <!-- Bibliotecas -->
@@ -11,19 +11,15 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <div class="wrap integrado-wrap" id="integradoWrap">
-    <header>
+  <div class="wrap dashboard-wrap">
+    <!-- Cabeçalho -->
+    <header class="header">
       <h1>Dashboard Integrado — Andaime & Pintura</h1>
-      <div class="subtitle">Integração: Consumo Pintura • STD Andaime • SGE Horas — indicadores baseados em STD</div>
+      <p class="subtitle">Integração: Consumo Pintura • STD Andaime • SGE Horas — indicadores baseados em STD</p>
     </header>
 
-    <div class="controls">
-      <button id="btnLoadExample">Carregar Mockup</button>
-      <button id="btnExportPDF">Exportar PDF</button>
-    </div>
-
     <!-- KPIs -->
-    <div class="kpi-row">
+    <div class="kpi-grid">
       <div class="kpi-card">
         <div class="label">STD Pintura (médio)</div>
         <div class="value" id="kpiStdPintura">-</div>
@@ -42,39 +38,43 @@
       </div>
     </div>
 
-    <!-- Charts e listas -->
-    <div class="charts-grid">
+    <!-- Botões de ação -->
+    <div class="controls">
+      <button id="btnLoadExample">Carregar Mockup</button>
+      <button id="btnExportPDF">Exportar PDF</button>
+    </div>
+
+    <!-- Área de gráficos e listas -->
+    <div class="dashboard-grid">
+      <!-- Coluna esquerda -->
       <div class="col-left">
         <div class="card">
-          <div class="card-title">Tendência STD — Pintura (HH / m²) & Andaime (HH / m.l.)</div>
+          <div class="card-title">Tendência STD — Pintura & Andaime</div>
           <canvas id="trendChart"></canvas>
         </div>
-        <div class="card" style="margin-top:12px">
+        <div class="card">
           <div class="card-title">Comparativo Previsto x Real (HH)</div>
           <canvas id="hhCompareChart"></canvas>
         </div>
-        <div class="card" style="margin-top:12px">
-          <div class="card-title">Amostra — Pintura</div>
-          <div class="table-container">
-            <table id="samplePintura"></table>
-          </div>
-        </div>
-        <div class="card" style="margin-top:12px">
-          <div class="card-title">Amostra — Andaime</div>
-          <div class="table-container">
-            <table id="sampleAndaime"></table>
-          </div>
-        </div>
       </div>
 
+      <!-- Coluna direita -->
       <div class="col-right">
         <div class="card">
-          <div class="card-title">Produtividade — Pintura (top 8)</div>
-          <ul id="prodPintura" class="prod-list"></ul>
+          <div class="card-title">Tendência por Encarregado — Pintura</div>
+          <ul id="listPintura" class="trend-list"></ul>
         </div>
-        <div class="card" style="margin-top:12px">
-          <div class="card-title">Produtividade — Andaime (top 8)</div>
-          <ul id="prodAndaime" class="prod-list"></ul>
+        <div class="card">
+          <div class="card-title">Tendência por Encarregado — Andaime</div>
+          <ul id="listAndaime" class="trend-list"></ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Amostra Pintura</div>
+          <table id="tablePintura" class="sample-table"></table>
+        </div>
+        <div class="card">
+          <div class="card-title">Amostra Andaime</div>
+          <table id="tableAndaime" class="sample-table"></table>
         </div>
       </div>
     </div>
