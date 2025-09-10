@@ -2,9 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard Integrado — Andaime & Pintura</title>
   <link rel="stylesheet" href="dashboard_integrado.css">
+  <!-- Bibliotecas -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -41,6 +42,7 @@
       </div>
     </div>
 
+    <!-- Charts e listas -->
     <div class="charts-grid">
       <div class="col-left">
         <div class="card">
@@ -51,24 +53,28 @@
           <div class="card-title">Comparativo Previsto x Real (HH)</div>
           <canvas id="hhCompareChart"></canvas>
         </div>
+        <div class="card" style="margin-top:12px">
+          <div class="card-title">Amostra — Pintura</div>
+          <div class="table-container">
+            <table id="samplePintura"></table>
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <div class="card-title">Amostra — Andaime</div>
+          <div class="table-container">
+            <table id="sampleAndaime"></table>
+          </div>
+        </div>
       </div>
 
       <div class="col-right">
         <div class="card">
-          <div class="card-title">Produtividade por Encarregado — Pintura (Top 8)</div>
-          <ul id="listStdPintura" class="list-card"></ul>
+          <div class="card-title">Produtividade — Pintura (top 8)</div>
+          <ul id="prodPintura" class="prod-list"></ul>
         </div>
-        <div class="card">
-          <div class="card-title">Produtividade por Encarregado — Andaime (Top 8)</div>
-          <ul id="listStdAndaime" class="list-card"></ul>
-        </div>
-        <div class="card">
-          <div class="card-title">Amostra Pintura</div>
-          <ul id="samplePintura" class="list-card"></ul>
-        </div>
-        <div class="card">
-          <div class="card-title">Amostra Andaime</div>
-          <ul id="sampleAndaime" class="list-card"></ul>
+        <div class="card" style="margin-top:12px">
+          <div class="card-title">Produtividade — Andaime (top 8)</div>
+          <ul id="prodAndaime" class="prod-list"></ul>
         </div>
       </div>
     </div>
